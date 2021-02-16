@@ -1,0 +1,46 @@
+{
+  "name": "api",
+  "version": "1.1.0",
+  "description": "A Node.js starter for the Serverless Framework with async/await and unit test support",
+  "main": "handler.js",
+  "scripts": {
+    "start": "./node_modules/.bin/serverless offline -s dev",
+    "debug_mac": "export \"SLS_COGNITO_IDENTITY_ID=eu-west-1:559b7866-e62c-49f2-b2c5-e5ca5ef48e97\" SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline -s dev --baseUrl=http://localhost:4000",
+    "debug_windows": "SET \"SLS_COGNITO_IDENTITY_ID=eu-west-1:66962659-97c4-4009-972c-dbffe05fa4d4\" && node --inspect %USERPROFILE%\\AppData\\Roaming\\npm\\node_modules\\serverless\\bin\\serverless offline -s dev --baseUrl=http://localhost:4000",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnomalyInnovations/serverless-nodejs-starter.git"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.398.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-source-map-support": "^1.0.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-3": "^6.24.1",
+    "jest": "^21.2.1",
+    "serverless-offline": "^4.6.0",
+    "serverless-webpack": "^5.1.0",
+    "webpack": "^4.29.3",
+    "webpack-node-externals": "^1.6.0"
+  },
+  "dependencies": {
+    "@babel/helpers": "^7.4.3",
+    "axios": "^0.18.0",
+    "babel-runtime": "^6.26.0",
+    "dropbox": "^4.0.17",
+    "es6-promise": "^4.2.6",
+    "isomorphic-fetch": "^2.2.1",
+    "qs": "^6.7.0",
+    "serverless": "^1.40.0",
+    "simple-oauth2": "^2.2.1",
+    "source-map-support": "^0.5.10",
+    "uuid": "^3.3.2",
+    "weight-randomizer": "^1.0.4"
+  }
+}

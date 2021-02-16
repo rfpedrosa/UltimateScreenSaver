@@ -1,0 +1,8 @@
+.app {
+  margin: 15px;
+}
+
+.app .navbar-brand {
+  font-weight: bold;
+  cursor: pointer;
+}

@@ -1,0 +1,258 @@
+service: ultimatescreensaver-${self:custom.environment.APP_NAME}
+
+# Use the serverless-webpack plugin to transpile ES6
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+# serverless-webpack configuration
+# Enable auto-packing of external modules
+custom:
+  # Our stage is based on what is passed in when running serverless
+  # commands. Or fallsback to what we have set in the provider section.
+  stage: ${opt:stage, self:provider.stage}
+  region: "${opt:region, self:provider.region}"
+  # Set the table name here so we can use it while testing locally
+  tableNameRecipes: ${self:service}-${self:custom.stage}-recipes
+  tableNamePlaylists: ${self:service}-${self:custom.stage}-playlists
+  tableNameUserTokens: ${self:service}-${self:custom.stage}-user-tokens
+  UserPoolName: ${self:service}-${self:custom.stage}-user-pool
+  UserPoolClient: ${self:service}-${self:custom.stage}-user-pool-client
+  IdentityPoolName: ultimatescreensaver ${self:custom.environment.APP_NAME} ${self:custom.stage} identity pool
+  # Set our DynamoDB throughput for prod and all other non-prod stages.
+  tableThroughputs:
+    prod: 5
+    default: 1
+  tableThroughput: ${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}
+  # Load our webpack config
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  # Load our secret environment variables based on the current stage.
+  # Fallback to dev if it is not in prod.
+  environment: ${file(env.yml):${self:custom.stage}, file(env.yml):dev}
+  serverless-offline:
+    host: localhost
+    port: 4000
+
+  default_baseurl: # http://www.goingserverless.com/blog/api-gateway-url
+      {
+        "Fn::Join":
+          [
+            "",
+            [
+              "https://",
+              { "Ref": "ApiGatewayRestApi" },
+              ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}",
+            ]
+          ]
+      }
+  baseUrl: ${opt:baseUrl, self:custom.default_baseurl}
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  region: eu-west-1
+
+  # These environment variables are made available to our functions
+  # under process.env.
+  environment:
+    tableNameRecipes: ${self:custom.tableNameRecipes}
+    tableNamePlaylists: ${self:custom.tableNamePlaylists}
+    tableNameUserTokens: ${self:custom.tableNameUserTokens}
+
+    baseUrl: ${self:custom.baseUrl}
+
+    googleAuthorizationHost: ${self:custom.environment.google.auth.authorizationHost}
+    googleTokenHost: ${self:custom.environment.google.auth.tokenHost}
+    googleClientId: ${self:custom.environment.google.auth.clientId}
+    googleClientSecret: ${self:custom.environment.google.auth.clientSecret}
+
+    googleApiBaseUrl: ${self:custom.environment.google.api.baseUrl}
+    googleAlbumsPageSize: 50
+    googleSearchPageSize: 100
+    googlePhotosToLoad: 100
+
+    dropboxAuthorizationHost: ${self:custom.environment.dropbox.auth.authorizationHost}
+    dropboxTokenHost: ${self:custom.environment.dropbox.auth.tokenHost}
+    dropboxClientId: ${self:custom.environment.dropbox.auth.clientId}
+    dropboxClientSecret: ${self:custom.environment.dropbox.auth.clientSecret}
+
+    dropboxApiBaseUrl: ${self:custom.environment.dropbox.api.baseUrl}
+
+    feedlyAuthorizationHost: ${self:custom.environment.feedly.auth.authorizationHost}
+    feedlyTokenHost: ${self:custom.environment.feedly.auth.tokenHost}
+    feedlyClientId: ${self:custom.environment.feedly.auth.clientId}
+    feedlyClientSecret: ${self:custom.environment.feedly.auth.clientSecret}
+
+    feedlyApiBaseUrl: ${self:custom.environment.feedly.api.baseUrl}
+
+    AWSAccessKey: ${self:custom.environment.callbackAWSInfo.accessKey}
+    AWSSecretKey: ${self:custom.environment.callbackAWSInfo.secretKey}
+
+    playlistSequenceLengthDefault: 1000
+    playlistSequenceReturnedToClient: 100
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      # Restrict our IAM role permissions to
+      # the specific table for the stage
+      Resource:
+        - "Fn::GetAtt": [ RecipesTable, Arn ]
+        - "Fn::GetAtt": [ UserTokensTable, Arn ]
+
+functions:
+  recipes-create:
+    handler: recipes/create.main
+    events:
+      - http:
+          path: recipes
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  recipes-get:
+    handler: recipes/get.main
+    events:
+      - http:
+          path: recipes/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  recipes-list:
+    handler: recipes/list.main
+    events:
+      - http:
+          path: recipes
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  recipes-update:
+    handler: recipes/update.main
+    events:
+      - http:
+          path: recipes/{id}
+          method: put
+          cors: true
+          authorizer: aws_iam
+
+  recipes-delete:
+    handler: recipes/delete.main
+    events:
+      - http:
+          path: recipes/{id}
+          method: delete
+          cors: true
+          authorizer: aws_iam
+
+  playlists-create:
+    handler: playlists/create.main
+    events:
+      - http:
+          path: playlists
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  feedly-auth:
+    handler: feedly/auth/auth.main
+    events:
+      - http:
+          path: feedly/auth/auth
+          method: get
+          cors: true
+
+  feedly-callback:
+    handler: feedly/auth/callback.main
+    events:
+      - http:
+          path: feedly/auth/callback
+          method: get
+          cors: true
+
+  feedly-feeds:
+    handler: feedly/listFeeds.main
+    events:
+      - http:
+          path: feedly/feeds
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  google-auth:
+    handler: google/auth/auth.main
+    events:
+      - http:
+          path: google/auth/auth
+          method: get
+          cors: true
+
+  google-callback:
+    handler: google/auth/callback.main
+    events:
+      - http:
+          path: google/auth/callback
+          method: get
+          cors: true
+
+  google-albums:
+    handler: google/listAlbums.main
+    events:
+      - http:
+          path: google/albums
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  dropbox-auth:
+    handler: dropbox/auth/auth.main
+    events:
+      - http:
+          path: dropbox/auth/auth
+          method: get
+          cors: true
+
+  dropbox-callback:
+    handler: dropbox/auth/callback.main
+    events:
+      - http:
+          path: dropbox/auth/callback
+          method: get
+          cors: true
+
+  dropbox-folders:
+    handler: dropbox/listFolders.main
+    events:
+      - http:
+          path: dropbox/folders
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  user-providers-connection-list:
+    handler: user/providers/connections/list.main
+    events:
+      - http:
+          path: user/providers/connections
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+# Create our resources with separate CloudFormation templates
+resources:
+  # DynamoDB
+  - ${file(resources/dynamodb-table.yml)}
+  # Cognito
+  - ${file(resources/cognito-user-pool.yml)}
+  - ${file(resources/cognito-identity-pool.yml)}

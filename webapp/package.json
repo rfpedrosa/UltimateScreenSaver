@@ -1,0 +1,77 @@
+{
+  "name": "webapp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.14",
+    "@fortawesome/free-brands-svg-icons": "^5.7.1",
+    "@fortawesome/free-regular-svg-icons": "^5.7.1",
+    "@fortawesome/free-solid-svg-icons": "^5.7.1",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "aws-amplify": "^1.1.19",
+    "bootstrap": "^4.2.1",
+    "i18next": "^14.0.1",
+    "i18next-xhr-backend": "^1.5.1",
+    "jquery": "^3.3.1",
+    "node-gyp": "^3.8.0",
+    "react": "^16.6.3",
+    "react-checkbox-tree": "^1.5.1",
+    "react-dom": "^16.6.3",
+    "react-full-screen": "^0.2.4",
+    "react-grid-gallery": "^0.5.3",
+    "react-i18next": "^9.0.10",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "^2.1.8",
+    "react-select": "^2.4.2",
+    "react-stepzilla": "^5.0.0",
+    "reactstrap": "^7.1.0",
+    "source-map-explorer": "^1.6.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "^1.2.7"
+  },
+  "scripts": {
+    "analyze": "source-map-explorer build/static/js/main.*",
+    "start": "cross-env REACT_APP_STAGE=dev react-scripts start",
+    "build": "react-scripts build",
+    "test": "jest",
+    "eject": "react-scripts eject",
+    "predeploy": "cross-env REACT_APP_STAGE=dev npm run build",
+    "predeploy:prod": "cross-env REACT_APP_STAGE=production npm run build"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "cross-env": "^5.2.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.9.0",
+    "enzyme-to-json": "^3.3.5",
+    "jest-transform-stub": "^2.0.0",
+    "react-test-renderer": "^16.7.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest",
+      ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!react-checkbox-tree)"
+    ],
+    "setupFiles": [
+      "./src/setupTests.js"
+    ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "weight-randomizer",
+  "version": "1.0.1",
+  "description": "Create random array sequence based on group weight. Implementation is based on fair die algorithm http://www.keithschwarz.com/darts-dice-coins/",
+  "main": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "files": [
+    "lib"
+  ],
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "\\.ts$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "/src/.*\\.spec\\.ts$"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:minjas/Randomizer.git"
+  },
+  "keywords": [
+    "weight",
+    "randomization",
+    "fair die algorithm"
+  ],
+  "author": "Minja Siljegovic (msiljegovic@gmail.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/minjas/Randomizer/issues"
+  },
+  "homepage": "https://github.com/minjas/Randomizer#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.6",
+    "jest": "^24.1.0",
+    "ts-jest": "^24.0.0",
+    "typescript": "^3.3.3333"
+  }
+}
